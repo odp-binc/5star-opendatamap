@@ -1,36 +1,46 @@
 
-var parseSparqlResult = function(result) {
+var defaultParseBindings = function(result, parseLiteral) {
   var data = [];
   var vars = result.head.vars;
   var bindings = result.results.bindings;
   for (var i = 0; i < bindings.length; i++) {
-    var row = {};
+    var row = {lang: {}};
     for (var j = 0; j < vars.length; j++) {
       var k = vars[j];
       var v = bindings[i][k];
-      if (!v) {
-      } else if (!'type' in v || v.type !== 'typed-literal') {
-        row[k] = v.value;
-      } else if (v.datatype === 'http://www.w3.org/2001/XMLSchema#integer') {
-        row[k] = parseInt(v.value);
-      } else if (v.datatype === 'http://www.w3.org/2001/XMLSchema#float') {
-        row[k] = parseFloat(v.value);
-      } else if (v.datatype === 'http://www.w3.org/2001/XMLSchema#gYear') {
-        row[k] = parseInt(v.value);
-      } else if (v.datatype === 'http://www.w3.org/2001/XMLSchema#dateTime') {
-        row[k] = newDate(v.value);
-      } else {
-        row[k] = v.value;
-      }
+      row[k] = parseTypedLiteral(v, parseLiteral);
     }
     data.push(row);
   }
   return data;
 };
 
+var parseTypedLiteral = function(v, parseLiteral) {
+  if (!v) {
+    return null;
+  } else if (!'type' in v) {
+  } else if (v.type === 'uri') {
+    return v.value;
+  } else if (v.type !== 'typed-literal') {
+  } else if (v.datatype === 'http://www.w3.org/2001/XMLSchema#integer') {
+    return parseInt(v.value);
+  } else if (v.datatype === 'http://www.w3.org/2001/XMLSchema#float') {
+    return parseFloat(v.value);
+  } else if (v.datatype === 'http://www.w3.org/2001/XMLSchema#gYear') {
+    return parseInt(v.value);
+  } else if (v.datatype === 'http://www.w3.org/2001/XMLSchema#dateTime') {
+    return newDate(v.value);
+  }
+  if (parseLiteral) {
+    return parseLiteral(v);
+  }
+  return v.value;
+};
+
 var parser = function(request) {
   return function(result) {
-    request.parse(parseSparqlResult(result));
+    var parseBindings = request.parseBindings || defaultParseBindings;
+    request.parse(parseBindings(result, request.parseLiteral));
   };
 };
 

@@ -199,7 +199,7 @@ RequestSpotTitle.prototype.query = function() {
 
       + 'SELECT ?s ?title { '
       +   '?s ic:名称/ic:表記 ?title . '
-      +   'FILTER (!isBlank(?s)' + filter + ') '
+      +   'FILTER (!isBlank(?s)' + filter + ' && lang(?title) in ("ja", "")) '
       + '} '
       + 'ORDER BY ?s '
       + 'OFFSET ' + this.offset
@@ -272,6 +272,14 @@ RequestSpotDetail.prototype.parse = function(results) {
   }
 };
 
+RequestSpotDetail.prototype.parseLiteral = function(literal) {
+  var lang = literal['xml:lang'];
+  if (lang && lang.length > 0) {
+    return { value: literal.value, lang: lang };
+  }
+  return literal.value;
+};
+
 RequestSpotDetail.prototype.getPropertyAndObject = function(data) {
   var path = toShortForm(data.p1);
   var object = data.o1;
@@ -281,7 +289,8 @@ RequestSpotDetail.prototype.getPropertyAndObject = function(data) {
       break;
     }
     path += "/" + toShortForm(data[key]);
-    object = data['o' + i];
+    var okey = 'o' + i;
+    object = data[okey];
   }
   return { property: path, object: object };
 }
@@ -300,7 +309,7 @@ var SpotDetail = function(data) {
   this.address = data["ic:住所/ic:表記"] || data["ic:開催場所/ic:住所/ic:表記"];
   this.place = data["ic:開催場所/ic:名称/ic:表記"];
   this.price = data["ic:料金/ic:表記"];
-  this.genre = join(data["ic:種別"], ' / ');
+  this.genre = normalizeLiteral(data["ic:種別"], 'ja', ' / ');
   this.image = data["ic:画像"] || data["schema:image"];
   this.contact = data["ic:連絡先/ic:名称/ic:表記"];
   var phone = data["ic:連絡先/ic:電話番号"];
@@ -323,6 +332,29 @@ SpotDetail.prototype.getCategory = function() {
     return getCategory(this.type);
   }
   return null;
+};
+
+var normalizeLiteral = function(value, lang, separator) {
+  if (!value) {
+  } else if ($.isArray(value)) {
+    var array = [];
+    for (var i = 0; i < value.length; i++) {
+      var v = value[i];
+      if (!v.lang) {
+        array.push(v);
+      } else if (v.lang === lang) {
+        array.push(v.value);
+      }
+    }
+    separator = separator || ' / ';
+    return array.join(separator);
+  } else if (value.lang) {
+    if (value.lang === lang) {
+      return value.value;
+    }
+    return "";
+  }
+  return value;
 };
 
 

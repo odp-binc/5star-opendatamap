@@ -38,7 +38,7 @@ var showDetail = function(anchor) {
   var uri = decodeURIComponent($(anchor).data('spoturi'));
   var request = new RequestSpotDetail(uri, function(detail) {
     if (detailView) {
-      var title = $('<h3 />').text(detail.title);
+      var title = $('<h3 />').text(normalizeLiteral(detail.title, "ja"));
       $('#detail_title').empty().append(title)
 
       detailView.empty();
@@ -46,7 +46,7 @@ var showDetail = function(anchor) {
         return $('<a />').attr({
           href: 'https://www.google.co.jp/maps/?q=' + detail.getPosition().text,
           target: "_blank"
-        }).text(text);
+        }).text(normalizeLiteral(text, 'ja'));
       }
       var dl = $('<dl>');
       if (detail.category) {
@@ -66,7 +66,7 @@ var showDetail = function(anchor) {
       }
       if (detail.contact) {
         dl.append($('<dt>').text('連絡先'))
-          .append($('<dd>').text(detail.contact));
+          .append($('<dd>').text(normalizeLiteral(detail.contact, 'ja')));
       }
       if (detail.phone) {
         dl.append($('<dt>').text('電話番号'))
@@ -74,14 +74,14 @@ var showDetail = function(anchor) {
       }
       if (detail.price) {
         dl.append($('<dt>').text('料金'))
-          .append($('<dd>').text(detail.price));
+          .append($('<dd>').text(normalizeLiteral(detail.price, 'ja')));
       }
       if (detail.url) {
         dl.append($('<dt>').text('webサイト'))
           .append($('<dd>')
             .append($('<a />')
               .attr({ href: detail.url, target: '_blank' })
-              .html(detail.url.replace(/(\/+)/g, "$1<wbr>"))));
+              .html(detail.url.replace(/(\/+)/g, '$1<wbr>'))));
       }
       if (detail.image) {
         dl.append($('<dt>').text('画像'))
@@ -89,8 +89,11 @@ var showDetail = function(anchor) {
             .append($('<img>').attr({ src: detail.image })));
       }
       if (detail.description) {
-        dl.append($('<dt>').text('説明'))
-          .append($('<dd>').addClass('description').html(detail.description.replace(/\n/g, "<br>")));
+        var desc = normalizeLiteral(detail.description, 'ja', '\n\n');
+        if (desc.length > 0) {
+          dl.append($('<dt>').text('説明'))
+            .append($('<dd>').addClass('description').html(desc.replace(/\n/g, '<br>')));
+        }
       }
       detailView.append(dl);
       detailOverlay.show();
