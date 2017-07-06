@@ -1,0 +1,108 @@
+body {
+    margin: 0;
+}
+
+@import 'spinner';
+@import 'detail';
+
+.overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgba(16, 16, 25, 0.8);
+}
+
+.float_left {
+    float: left;
+}
+
+.float_right {
+    float: right;
+}
+
+.right {
+    text-align: right;
+}
+
+#content_container {
+    position: absolute;
+    top: 36px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #e0e0f0;
+    margin: auto;
+    width: 80%;
+    max-height: 80%;
+    padding: 20px;
+
+    #about_view {
+        overflow-y: scroll;
+        height: 100%;
+
+        h4 {
+            margin-bottom: 4px;
+        }
+        p.description {
+            font-size: 14px;
+            margin-top: -4px;
+        }
+        dl {
+            dd {
+                border: 0px;
+            }
+        }
+    }
+}
+
+#ui_container {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+    height: 36px;
+    background-color: white;
+    #app_title {
+        padding: 6px;
+    }
+    #menu_back {
+        width: 80px;
+        height: 36px;
+    }
+    #menu_link {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        text-align: right;
+
+        ul {
+            margin: 5px;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        .menu.hidden {
+            display: none;
+        }
+    }
+    form {
+        margin-top: 6px;
+    }
+}
+
+#map_canvas {
+    margin-top: 36px;
+    height: 600px;
+}
+
+dl dt {
+    font-weight: bold;
+}
+
+dl dd {
+    padding-bottom: 3px;
+    border-bottom: 1px solid orange;
+    margin-bottom: 3px;
+}

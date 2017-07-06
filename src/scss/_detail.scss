@@ -1,0 +1,42 @@
+
+#detail_overlay {
+    display: none;
+    padding-top: 60px;
+
+    #detail_container {
+        background-color: #feffff;
+        width: 80%;
+        height: 500px;
+        margin: auto;
+        padding: 20px;
+        opacity: 1;
+        #detail_header {
+            h3 {
+                margin-top: 10px;
+            }
+        }
+
+        #detail_view {
+            overflow-x: hidden;
+            overflow-y: scroll;
+
+            dl {
+                margin-top: 0;
+
+                dd {
+                    margin-bottom: 8px;
+
+                    img {
+                        width: 100%;
+                        max-width: 300px;
+                    }
+                }
+
+                dd.description {
+                    font-size: 12px;
+                    -webkit-margin-start: 12px;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,70 @@
+@mixin animation($property, $value) {
+    -webkit-animation#{$property}: $value;
+    animation#{$property}: $value;
+}
+
+#spinner_overlay {
+    #spinner_container {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        max-width: 300px;
+        max-height: 300px;
+
+        #spinner {
+            width: 100px;
+            height: 40px;
+            text-align: center;
+            font-size: 10px;
+            margin: 100px auto 40px;
+
+            div {
+                background-color: #e0e0f0;
+                height: 100%;
+                width: 6px;
+                display: inline-block;
+        
+                @include animation('',  stretch-rect 1.2s infinite ease-in-out);
+            }
+
+            @for $i from 2 through 5 {
+                .rect#{$i} {
+                    @include animation(-delay, -1.3s + ($i / 10));
+                    margin-left: 5px;
+                }
+            }
+          
+        }
+        #spinner_notice {
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            height: 120px;
+        }
+    }
+}
+
+
+@-webkit-keyframes stretch-rect {
+    0%, 40%, 100% { 
+        -webkit-transform: scaleY(0.4);
+    }  
+    20% { 
+        -webkit-transform: scaleY(1.0); 
+    }
+}
+
+@keyframes stretch-rect {
+  0%, 40%, 100% { 
+    transform: scaleY(0.4);
+    -webkit-transform: scaleY(0.4);
+  }
+  20% { 
+    transform: scaleY(1.0);
+    -webkit-transform: scaleY(1.0);
+  }
+}
+

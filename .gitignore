@@ -1,0 +1,13 @@
+.*
+!.gitignore
+!.gitkeep
+
+*.html
+!index.html
+
+node_modules/
+tmp/*
+!tmp/.gitkeep
+
+package-lock.json
+
