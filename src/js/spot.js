@@ -150,7 +150,7 @@ RequestSpot.prototype.parse = function(results) {
       this.spots[spot.uri] = spot;
     }
   }
-  if (false && results.length === this.limit) {
+  if (results.length === this.limit) {
     this.offset += this.limit;
     executeSparql(this);
   } else {
