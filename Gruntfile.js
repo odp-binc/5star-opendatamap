@@ -25,7 +25,7 @@ module.exports = function (grunt) {
     cssmin: {
       target: {
         files: {
-          "dest/css/main.min.css": "tmp/css/main.css"
+          "docs/css/main.min.css": "tmp/css/main.css"
         }
       }
     },
@@ -38,14 +38,14 @@ module.exports = function (grunt) {
     uglify: {
       dist: {
         files: {
-          "dest/js/main.min.js": "tmp/js/main.js"
+          "docs/js/main.min.js": "tmp/js/main.js"
         }
       }
     },
     htmlmin: {
       dist: {
         files: {
-          "dest/index.html": "src/index.html"
+          "docs/index.html": "src/index.html"
         },
         options: {
           removeComments: true,
@@ -65,7 +65,7 @@ module.exports = function (grunt) {
             expand: true,
             cwd: "src/images",
             src: "**",
-            dest: "dest/images"
+            dest: "docs/images"
           }
         ]
       },
@@ -80,7 +80,7 @@ module.exports = function (grunt) {
             expand: true,
             cwd: "src/js/lib",
             src: "**",
-            dest: "dest/js/lib"
+            dest: "docs/js/lib"
           }
         ]
       }
