@@ -28,9 +28,9 @@ var initDetailView = function() {
 
 var setDetailViewHeight = function() {
   if (windowSize && $('#detail_overlay').is(':visible')) {
-    var ch = Math.floor(windowSize.height * 0.8);
-    detailContainer.height(ch);
-    detailView.height(ch - $('#detail_header').outerHeight() - 20);
+    var ch = $('#detail_container').height();
+    var hh = $('#detail_header').outerHeight();
+    $('#detail_view').height(ch - hh - 20);
   }
 };
 
@@ -97,6 +97,7 @@ var showDetail = function(anchor) {
       }
       detailView.append(dl);
       detailOverlay.show();
+      lastOpenInfoWindow.close();
     }
   });
   executeSparql(request);

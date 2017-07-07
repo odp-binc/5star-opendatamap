@@ -1,13 +1,16 @@
+@import 'variables';
+
 body {
     margin: 0;
+    min-width: 300px;
+    font-family:  "Hiragino Kaku Gothic ProN", "游ゴシック", YuGothic, "Yu Gothic", Meiryo, sans-serif;
+    color: $color;
 }
 
-@import 'spinner';
-@import 'detail';
-
 .overlay {
+    display: none;
     position: fixed;
-    top: 0;
+    top: 36px;
     bottom: 0;
     width: 100%;
     background-color: rgba(16, 16, 25, 0.8);
@@ -25,75 +28,12 @@ body {
     text-align: right;
 }
 
-#content_container {
-    position: absolute;
-    top: 36px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: #e0e0f0;
-    margin: auto;
-    width: 80%;
-    max-height: 80%;
-    padding: 20px;
-
-    #about_view {
-        overflow-y: scroll;
-        height: 100%;
-
-        h4 {
-            margin-bottom: 4px;
-        }
-        p.description {
-            font-size: 14px;
-            margin-top: -4px;
-        }
-        dl {
-            dd {
-                border: 0px;
-            }
-        }
-    }
-}
-
-#ui_container {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-    height: 36px;
-    background-color: white;
-    #app_title {
-        padding: 6px;
-    }
-    #menu_back {
-        width: 80px;
-        height: 36px;
-    }
-    #menu_link {
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 200px;
-        text-align: right;
-
-        ul {
-            margin: 5px;
-            padding: 0;
-            list-style-type: none;
-        }
-
-        .menu.hidden {
-            display: none;
-        }
-    }
-    form {
-        margin-top: 6px;
-    }
+a.disabled {
+    text-decoration: none;
+    color: $color;
 }
 
 #map_canvas {
-    margin-top: 36px;
     height: 600px;
 }
 
@@ -106,3 +46,9 @@ dl dd {
     border-bottom: 1px solid orange;
     margin-bottom: 3px;
 }
+
+@import 'spinner';
+@import 'header';
+@import 'detail';
+@import 'content';
+

@@ -1,0 +1,53 @@
+#header {
+    position: relative;
+    top: 0;
+    width: 100%;
+    min-height: 36px;
+    background-color: $header_bgcolor;
+    border-bottom: 1px solid $header_border_color;
+    #app_title {
+        padding: 6px;
+    }
+    #menu_back {
+        width: 80px;
+        height: 36px;
+    }
+    #menu_link {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        text-align: right;
+        z-index: 10;
+
+        ul {
+            margin: 5px;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        .menu.hidden {
+            display: none;
+        }
+    }
+    #menu_link.open {
+        background-color: $header_bgcolor;
+        border-left: 1px solid $header_border_color;
+        border-bottom: 1px solid $header_border_color;
+
+        .menu.head {
+            background-color: #f8f8ff;
+        }
+    }
+    form {
+        margin-top: 6px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    &:after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+}
+

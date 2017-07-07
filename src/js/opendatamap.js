@@ -10,7 +10,7 @@ $(function() {
       height: window.innerHeight || $(window).height()
     };
 
-    $('#map_canvas').height(windowSize.height - 36);
+    $('#map_canvas').height(windowSize.height - $('#header').height());
     if (map) {
       google.maps.event.trigger(map, 'resize');
     }
@@ -19,12 +19,13 @@ $(function() {
 
   adjustSize();
   var adjustTask = false;
-  $(window).resize(function() {
+  var resetAdjustTask = function() {
     if (adjustTask) {
       clearTimeout(adjustTask);
     }
     adjustTask = setTimeout(adjustSize, 200);
-  });
+  };
+  $(window).resize(resetAdjustTask);
 
   initSpinner();
   initDetailView();
@@ -90,6 +91,7 @@ $(function() {
       form.append(filter).append($('<label>').attr('for', key).text(categories[key].text));
       clusterer.addMarkers(getMarkers(key))
     }
+    resetAdjustTask();
     stopSpinner();
   };
 });
