@@ -16,6 +16,7 @@
 
     #about_view {
         overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
         height: 100%;
 
         h4 {
