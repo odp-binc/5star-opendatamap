@@ -49,7 +49,7 @@ var showDetail = function(uri) {
     if (detailView) {
       location.hash = encodeURIComponent(uri);
       var title = $('<h3 />').text(normalizeLiteral(detail.title, "ja"));
-      $('#detail_title').empty().append(title)
+      $('#detail_title').empty().append(title);
 
       detailView.empty();
       var mapLink = function(text) {
@@ -116,6 +116,7 @@ var showDetail = function(uri) {
       if (lastOpenInfoWindow) {
         lastOpenInfoWindow.close();
       }
+      detailView.scrollTop(0);
     }
   });
   executeSparql(request);
