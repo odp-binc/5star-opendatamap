@@ -60,7 +60,8 @@ Spot.prototype.getInfoContent = function() {
     +   '<dt>地理座標</dt><dd>' + this.position.text + '</dd>'
     +   '</dl>'
     +   '<div style="text-align:right;">'
-    +     '<a href="#" onclick="showDetail(this);return false;" data-spoturi="' + encodeURIComponent(this.uri) + '">詳細はこちら</a>'
+    +     '<a href="#'
+    +       encodeURIComponent(this.uri) + '">詳細はこちら</a>'
     +   '</div>'
     + '</div>';
 };
@@ -109,12 +110,13 @@ var getCategory = function(type) {
 var unknownType = {};
 
 
-var RequestSpot = function(callback) {
+var RequestSpot = function(bounds, callback) {
   this.name = 'Spot';
   this.offset = 0;
   this.limit = 10000;
   this.executed = false;
   this.spots = {};
+  this.bounds = bounds;
   this.callback = callback || function() { console.log('spot data has loaded.') };
 };
 
@@ -122,22 +124,29 @@ RequestSpot.prototype.query = function() {
   var query =
         'PREFIX ic: <http://imi.go.jp/ns/core/rdf#> '
       + 'PREFIX odp: <http://odp.jig.jp/odp/1.0#> '
-      + 'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> '
       + 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> '
+      + 'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> '
+      + 'PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> '
 
       + 'SELECT ?s1 ?type1 ?s2 ?type2 ?genre1 ?lat ?lng { '
       +   '?s1 ic:地理座標 [ ic:緯度 ?lat ; ic:経度 ?lng ] ; a ?type1 . '
-      +     'OPTIONAL { '
-      +       '{ ?s1 ic:種別 ?genre1 } '
-      +       'UNION { '
-      +         '?s1 odp:genre/rdf:_1/odp:genre* [ a odp:LargeGenre ; rdfs:label ?genre1 ] '
-      +       '} } . '
-      +     'OPTIONAL { ?s2 ?p1 ?s1 ; a ?type2 } '
-      +   'FILTER ( !BOUND(?p1) || ?p1 != <http://www.w3.org/2002/07/owl#sameAs> ) '
+      +   'OPTIONAL { '
+      +     '{ ?s1 ic:種別 ?genre1 } '
+      +     'UNION { '
+      +       '?s1 odp:genre/rdf:_1/odp:genre* [ a odp:LargeGenre ; rdfs:label ?genre1 ] '
+      +     '} } . '
+      +   'OPTIONAL { ?s2 ?p1 ?s1 ; a ?type2 } . '
+      +   'FILTER ( (!BOUND(?p1) || ?p1 != <http://www.w3.org/2002/07/owl#sameAs>) '
+      +     ' && xsd:float(?lat)>' + this.bounds.south.toFixed(2)
+      +     ' && xsd:float(?lat)<' + this.bounds.north.toFixed(2)
+      +     ' && xsd:float(?lng)>' + this.bounds.west.toFixed(2)
+      +     ' && xsd:float(?lng)<' + this.bounds.east.toFixed(2)
+      +   ') '
       + '} '
       + 'ORDER BY ?s1 ?s2 '
       + 'OFFSET ' + this.offset
       + ' LIMIT ' + this.limit;
+  console.log(query);
   return query;
 }
 
@@ -150,73 +159,104 @@ RequestSpot.prototype.parse = function(results) {
       this.spots[spot.uri] = spot;
     }
   }
-  if (!getEnv().debug && results.length === this.limit) {
+  if (results.length === this.limit) {
     this.offset += this.limit;
     executeSparql(this);
   } else {
     var reqSpot = this;
-    var requestSpotTitle = new RequestSpotTitle(this.spots, function() {
+    var requestSpotTitle = new RequestSpotTitle(this.spots, this.bounds, function() {
       reqSpot.callback(reqSpot.spots);
     });
     executeSparql(requestSpotTitle);
   }
 };
 
-var RequestSpotTitle = function(spots, callback) {
+var RequestSpotTitle = function(spots, bounds, callback) {
   this.name = 'SpotTitle';
   this.offset = 0;
   this.limit = 10000;
   this.spots = spots;
   this.executed = false;
+  this.bounds = bounds;
+  this.uris = this.getSpotUris();
+  this.filter = this.nextFilter();
+  this.last = null;
   this.callback = callback || function() { console.log('spot title has loaded.') };
 };
 
-RequestSpotTitle.prototype.getRange = function() {
-  var first = null;
-  var last = null;
+RequestSpotTitle.prototype.getSpotUris = function() {
+  var array = [];
   for (var key in this.spots) {
-    if (!first || key < first) {
-      first = key;
-    }
-    if (!last || last < key) {
-      last = key;
-    }
+    array.push(key);
   }
-  return { first: first, last: last };
+  return array.sort();
+};
+
+
+RequestSpotTitle.prototype.nextFilter = function() {
+  var first = this.last;
+  var array = this.uris;
+  var last;
+  if (first) {
+    var i;
+    for (i = 0; i < array.length; i++) {
+      if (first < array[i]) {
+        break;
+      }
+    }
+    i += this.limit;
+    last = array[array.length <= i ? array.length - 1 : i];
+  } else {
+    first = array[0];
+    last = array[array.length <= this.limit ? array.length - 1 : this.limit];
+  }
+  return ' && str(?s)>"' + first + '" && str(?s)<="' + last + '" ';
 };
 
 RequestSpotTitle.prototype.query = function() {
-  var filter = "";
-  var range = this.getRange();
-  if (range.first && range.last) {
-    filter = ' && str(?s)>"' + range.first + '" && str(?s)<"' + range.last + '" ';
-  }
   var query =
         'PREFIX ic: <http://imi.go.jp/ns/core/rdf#> '
       + 'PREFIX odp: <http://odp.jig.jp/odp/1.0#> '
       + 'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> '
       + 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> '
+      + 'PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> '
 
       + 'SELECT ?s ?title { '
-      +   '?s ic:名称/ic:表記 ?title . '
-      +   'FILTER (!isBlank(?s)' + filter + ' && lang(?title) in ("ja", "")) '
+      +   '?s ic:名称/ic:表記 ?title. '
+      +   'FILTER ('
+      +     '!isBlank(?s) && lang(?title) in ("ja", "")' + this.filter
+      +   ') '
       + '} '
       + 'ORDER BY ?s '
       + 'OFFSET ' + this.offset
       + ' LIMIT ' + this.limit;
+  console.log(this.name, query);
   return query;
 };
 
 RequestSpotTitle.prototype.parse = function(results) {
+  var prev = this.last;
   for (var i = 0; i < results.length; i++) {
     var data = results[i];
     var spot = this.spots[data.s];
     if (spot) {
       spot.title = data.title;
     }
+    if (!this.last || this.last < data.s) {
+      this.last = data.s;
+    }
   }
-  if (results.length == this.limit) {
-    this.offset += this.limit;
+  if (results.length === this.limit) {
+    if (prev === this.last) {
+      this.offset += this.limit;
+    } else {
+      this.offset = 0;
+      this.filter = this.nextFilter();
+    }
+    executeSparql(this);
+  } else if (this.last < this.uris.last()) {
+    this.offset = 0;
+    this.filter = this.nextFilter();
     executeSparql(this);
   } else {
     this.callback();
@@ -264,11 +304,11 @@ RequestSpotDetail.prototype.parse = function(results) {
       this.result[data.property] = array;
     }
   }
-  if (results.length == this.limit) {
+  if (results.length === this.limit) {
     this.offset += this.limit;
     executeSparql(this);
   } else {
-    this.callback(new SpotDetail(this.result));
+    this.callback(new SpotDetail(this.uri, this.result));
   }
 };
 
@@ -295,8 +335,9 @@ RequestSpotDetail.prototype.getPropertyAndObject = function(data) {
   return { property: path, object: object };
 }
 
-var SpotDetail = function(data) {
+var SpotDetail = function(uri, data) {
   this.data = data;
+  this.uri = uri;
   this.title = data["ic:名称/ic:表記"] || data["rdfs:label"];
   this.category = getCategory(data["rdf:type"]);
   this.description = data["ic:説明"] || data["schema:description"];

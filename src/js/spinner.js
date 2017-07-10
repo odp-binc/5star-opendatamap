@@ -5,6 +5,10 @@ var initSpinner = function() {
   });
 }
 
+var showSpinner = function() {
+  $('#spinner_overlay').fadeIn();
+};
+
 var stopSpinner = function() {
   $('#spinner_overlay').fadeOut();
 }

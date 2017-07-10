@@ -7,6 +7,12 @@ Array.prototype.contains = function(v) {
   }
   return false;
 };
+Array.prototype.last = function() {
+  if (this.length === 0) {
+    return null;
+  }
+  return this[this.length - 1];
+};
 
 var join = function(target, separator) {
   if ($.isArray(target)) {

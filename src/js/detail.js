@@ -13,10 +13,10 @@ var initDetailView = function() {
   });
   detailOverlay = $('#detail_overlay');
   detailOverlay.click(function() {
-    detailOverlay.hide();
+    hideDetail();
   });
   $('#detail_close').click(function() {
-    detailOverlay.hide();
+    hideDetail();
     return false;
   });
 
@@ -34,10 +34,20 @@ var setDetailViewHeight = function() {
   }
 };
 
-var showDetail = function(anchor) {
+var hideDetail = function() {
+  location.hash = "";
+  detailOverlay.hide();
+};
+
+var onClickShowDetail = function(anchor) {
   var uri = decodeURIComponent($(anchor).data('spoturi'));
+  showDetail(uri);
+};
+
+var showDetail = function(uri) {
   var request = new RequestSpotDetail(uri, function(detail) {
     if (detailView) {
+      location.hash = encodeURIComponent(uri);
       var title = $('<h3 />').text(normalizeLiteral(detail.title, "ja"));
       $('#detail_title').empty().append(title)
 
@@ -49,6 +59,12 @@ var showDetail = function(anchor) {
         }).text(normalizeLiteral(text, 'ja'));
       }
       var dl = $('<dl>');
+      dl.append($('<dt>').text('Resource URI'))
+        .append($('<dd>')
+          .append($('<a />')
+              .attr({ href: detail.uri, target: '_blank' })
+              .html(separateUri(detail.uri))));
+
       if (detail.category) {
         dl.append($('<dt>').text('分類'))
           .append($('<dd>').text(detail.category.text));
@@ -81,7 +97,7 @@ var showDetail = function(anchor) {
           .append($('<dd>')
             .append($('<a />')
               .attr({ href: detail.url, target: '_blank' })
-              .html(detail.url.replace(/(\/+)/g, '$1<wbr>'))));
+              .html(separateUri(detail.url))));
       }
       if (detail.image) {
         dl.append($('<dt>').text('画像'))
@@ -97,8 +113,15 @@ var showDetail = function(anchor) {
       }
       detailView.append(dl);
       detailOverlay.show();
-      lastOpenInfoWindow.close();
+      if (lastOpenInfoWindow) {
+        lastOpenInfoWindow.close();
+      }
     }
   });
   executeSparql(request);
 };
+
+var separateUri = function(uri) {
+  return uri.replace(/(\/+)/g, '$1<wbr>');
+};
+
