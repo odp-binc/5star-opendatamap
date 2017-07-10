@@ -146,7 +146,6 @@ RequestSpot.prototype.query = function() {
       + 'ORDER BY ?s1 ?s2 '
       + 'OFFSET ' + this.offset
       + ' LIMIT ' + this.limit;
-  console.log(query);
   return query;
 }
 
@@ -230,7 +229,6 @@ RequestSpotTitle.prototype.query = function() {
       + 'ORDER BY ?s '
       + 'OFFSET ' + this.offset
       + ' LIMIT ' + this.limit;
-  console.log(this.name, query);
   return query;
 };
 
