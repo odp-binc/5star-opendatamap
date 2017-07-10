@@ -140,7 +140,7 @@ $(function() {
     }
   };
   var initMarkers = function() {
-    console.log("spots count", Object.keys(spots).length);
+    //console.log("spots count", Object.keys(spots).length);
     $.each(spots, function(index, spot) {
       getMarkers(spot.category.key).push(spot.getMarker(map));
     });

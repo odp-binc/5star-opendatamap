@@ -39,11 +39,6 @@ var hideDetail = function() {
   detailOverlay.hide();
 };
 
-var onClickShowDetail = function(anchor) {
-  var uri = decodeURIComponent($(anchor).data('spoturi'));
-  showDetail(uri);
-};
-
 var showDetail = function(uri) {
   var request = new RequestSpotDetail(uri, function(detail) {
     if (detailView) {
@@ -115,6 +110,7 @@ var showDetail = function(uri) {
       detailOverlay.show();
       if (lastOpenInfoWindow) {
         lastOpenInfoWindow.close();
+        lastOpenInfoWindow = undefined;
       }
       detailView.scrollTop(0);
     }
