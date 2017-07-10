@@ -28,6 +28,10 @@ Spot.prototype.getMarker = function(map) {
       content: this.getInfoContent(),
       maxWidth: 300
     });
+    infoWindow.addListener('closeclick', function() {
+      lastOpenInfoWindow = undefined;
+    });
+
     infoWindow.setPosition(this.position.getLatLng());
     if (this.markerClickListener) {
       marker.removeListener(this.markerClickListener);
