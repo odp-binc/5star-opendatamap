@@ -111,7 +111,6 @@ var getCategory = function(type) {
     }
     key = 'other';
   }
-  console.log('type', type, 'key', key);
   return categories[key];
 };
 
