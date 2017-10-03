@@ -105,9 +105,13 @@ var typeMap = {
 
 var getCategory = function(type) {
   var key = typeMap[type];
-  if (!key && !unknownType[type]) {
-    unknownType[type] = true;
+  if (!key) {
+    if (!unknownType[type]) {
+      unknownType[type] = true;
+    }
+    key = 'other';
   }
+  console.log('type', type, 'key', key);
   return categories[key];
 };
 

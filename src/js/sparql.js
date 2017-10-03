@@ -21,7 +21,7 @@ var parseTypedLiteral = function(v, parseLiteral) {
   } else if (!'type' in v) {
   } else if (v.type === 'uri') {
     return v.value;
-  } else if (v.type !== 'typed-literal') {
+  } else if (v.type !== 'literal') {
   } else if (v.datatype === 'http://www.w3.org/2001/XMLSchema#integer') {
     return parseInt(v.value);
   } else if (v.datatype === 'http://www.w3.org/2001/XMLSchema#float') {
